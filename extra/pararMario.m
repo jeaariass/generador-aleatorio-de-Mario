@@ -22,8 +22,11 @@ function pararMario()
     if isappdata(0,'marioPlayer')
         p = getappdata(0,'marioPlayer');
         try %#ok<TRYNC>
-            if isvalid(p) && isplaying(p)
-                stop(p);
+            if isvalid(p)
+                p.StopFcn = ''; % si no, el loop se reinicia solo al parar
+                if isplaying(p)
+                    stop(p);
+                end
             end
         end
         rmappdata(0,'marioPlayer');

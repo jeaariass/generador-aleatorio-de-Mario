@@ -201,8 +201,11 @@ function jugarMario()
             ganado = true;
             vivo = false;
             set(tituloTxt,'String','¡Meta alcanzada!');
-            if ~isempty(player) && isplaying(player)
-                stop(player);
+            if ~isempty(player) && isvalid(player)
+                player.StopFcn = ''; % si no, el loop se reinicia solo al parar
+                if isplaying(player)
+                    stop(player);
+                end
             end
         end
 
@@ -275,8 +278,11 @@ function jugarMario()
             delete(t);
         end
         try %#ok<TRYNC>
-            if ~isempty(player) && isvalid(player) && isplaying(player)
-                stop(player);
+            if ~isempty(player) && isvalid(player)
+                player.StopFcn = ''; % si no, el loop se reinicia solo al parar
+                if isplaying(player)
+                    stop(player);
+                end
             end
         end
     end
