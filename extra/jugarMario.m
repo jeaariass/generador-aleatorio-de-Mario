@@ -88,6 +88,12 @@ function jugarMario()
     tituloTxt = title(ax,'','Color','w');
     mirando = 1; % 1 = derecha, -1 = izquierda (para voltear el sprite)
 
+    % Boton de reinicio, oculto hasta que se alcance la meta.
+    botonReiniciar = uicontrol(fig,'Style','pushbutton', ...
+        'String','Reiniciar (nuevo mundo)','FontSize',11, ...
+        'Units','normalized','Position',[0.32,0.45,0.36,0.1], ...
+        'Visible','off','Callback',@reiniciarJuego);
+
     %% Estado del jugador -----------------------------------------------
     playerW = 12; playerH = 28;
     spawnX = 16; spawnY = worldRows*tile - tile*2 - playerH; % de pie sobre la fila 12
@@ -207,6 +213,7 @@ function jugarMario()
                     stop(player);
                 end
             end
+            set(botonReiniciar,'Visible','on');
         end
 
         dibujar();
@@ -263,6 +270,11 @@ function jugarMario()
             case 'rightarrow', teclas.der = false;
             case {'space','uparrow'}, teclas.salto = false;
         end
+    end
+
+    function reiniciarJuego(~,~)
+        close(fig); % detiene timer/musica y cierra la ventana actual
+        jugarMario(); % arranca una partida nueva, con mundo regenerado
     end
 
     function cerrar(~,~)
