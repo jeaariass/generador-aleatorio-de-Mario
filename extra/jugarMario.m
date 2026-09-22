@@ -96,7 +96,7 @@ function jugarMario()
     gravedad = 1400;  % px/s^2
     velSalto = -430;  % px/s
     velMover = 150;   % px/s
-    dt = 1/30;
+    dt = 0.033; % ~30 fps; timer solo acepta hasta 1 ms de precision
     camX = 0;
     vivo = true;
     ganado = false;
