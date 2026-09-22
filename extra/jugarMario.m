@@ -55,7 +55,13 @@ function jugarMario()
     rutaSprite = fullfile(recursosDir,'mario.png');
     if isfile(rutaSprite)
         try
-            [img,~,alpha] = imread(rutaSprite);
+            [img,mapa,alpha] = imread(rutaSprite);
+            if ~isempty(mapa) && ismatrix(img)
+                % PNG de colores indexados: aplicar la paleta, si no,
+                % se ven los indices crudos pintados con el colormap
+                % por defecto (franja morada/azul).
+                img = im2uint8(ind2rgb(img,mapa));
+            end
             spriteImg = image(ax,'CData',img,'XData',[0,1],'YData',[0,1]);
             if ~isempty(alpha)
                 set(spriteImg,'AlphaData',double(alpha)/255);
