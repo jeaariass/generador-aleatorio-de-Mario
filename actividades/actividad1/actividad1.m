@@ -20,8 +20,8 @@ function [posbloques2,postubos2] = actividad1(posbloques,postubos)
     % --- Dependencia: no repetir HH si la pareja anterior ya era HH ----
     parAnterior = posbloques(12,:);
     if isequal(parAnterior,[1,1])
+        p(1) = p(1) + p(2);
         p(2) = 0;
-        p = p/sum(p);
     end
 
     idx = va(1:4,p,1,1);
