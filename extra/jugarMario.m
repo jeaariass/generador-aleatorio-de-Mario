@@ -8,6 +8,11 @@ function jugarMario()
 %   Espacio o flecha arriba    : saltar
 %   Esc                        : salir
 %
+% Si la ventana queda trabada o algo no cierra bien, ejecuta en la
+% Command Window (sin necesidad de que la ventana tenga el foco):
+%
+%   pararMario
+%
 % Requiere: inicio.m, actividad1.m, generarNivelActividad1.m,
 %           mariomundo.m, va.m y las imagenes de bloques/tubos.
 %
@@ -38,7 +43,12 @@ function jugarMario()
     viewW = viewTiles*tile;
     viewH = worldH;
 
+    % Si ya habia una partida abierta (o quedo huerfana), la cerramos
+    % primero para no acumular timers/figuras/musica sueltos.
+    pararMario();
+
     fig = figure('Name','Mario jugable - Actividad 1','NumberTitle','off', ...
+        'Tag','marioFig', ...
         'Color','k','Position',[80,80,900,round(900*viewH/viewW)], ...
         'KeyPressFcn',@teclaPresionada,'KeyReleaseFcn',@teclaSoltada, ...
         'CloseRequestFcn',@cerrar,'MenuBar','none','ToolBar','none');
@@ -112,8 +122,15 @@ function jugarMario()
     end
 
     %% Bucle de juego (timer) ---------------------------------------------
-    t = timer('ExecutionMode','fixedRate','Period',dt,'TimerFcn',@actualizar);
+    t = timer('ExecutionMode','fixedRate','Period',dt,'TimerFcn',@actualizar, ...
+        'Tag','marioTimer');
     start(t);
+
+    % Registrar handles a nivel global para poder forzar el cierre desde
+    % fuera (pararMario) aunque la ventana quede sin responder.
+    setappdata(0,'marioTimer',t);
+    setappdata(0,'marioPlayer',player);
+    setappdata(0,'marioFig',fig);
 
     %% ---- Funciones anidadas -------------------------------------------
     function actualizar(~,~)
