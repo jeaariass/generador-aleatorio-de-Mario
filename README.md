@@ -61,6 +61,13 @@ Las probabilidades de la fila 12 se ajustan dentro de `actividad1.m` (variable `
 jugarMario
 ```
 
-Abre una ventana con el nivel generado por la Primera actividad; Mario (un sprite simplificado) se controla con las flechas y salta con espacio/flecha arriba. Suena de fondo un tema tipo chiptune inspirado en el tema principal, **sintetizado matemáticamente en `marioTheme.m`** (ondas cuadradas generadas por código, sin usar ningún archivo de audio con derechos de autor). Si caes en un hueco de la fila 12, reapareces un poco atrás. Esc cierra el juego.
+Abre una ventana con el nivel generado por la Primera actividad; Mario se controla con las flechas y salta con espacio/flecha arriba. Si caes en un hueco de la fila 12, **el nivel reinicia desde cero** (posición inicial, cámara al principio; el contador de muertes sube).
+
+Por defecto usa un sprite simplificado (rectángulo) y un tema tipo chiptune **sintetizado matemáticamente en `marioTheme.m`** (ondas cuadradas generadas por código, sin archivos de audio con derechos de autor). Si quieres el sprite y la música originales, no vienen incluidos en este repo por temas de derechos de autor de Nintendo — consíguelos tú por tu cuenta y colócalos aquí, el juego los detecta solos:
+
+- `recursos/mario.png` — sprite de Mario, PNG con canal alfa (fondo transparente), de pie, ideal 16x32 o 32x32 px.
+- `recursos/tema.mp3` — música de fondo, cualquier mp3.
+
+Si no están esos archivos, el juego sigue funcionando igual con el sprite/música por defecto.
 
 Esto es un añadido para practicar/divertirse; lo único evaluado por la rúbrica es `actividad1.m` + `ejecutarActividad1.m`.

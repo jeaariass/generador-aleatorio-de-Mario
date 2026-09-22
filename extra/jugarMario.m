@@ -10,6 +10,15 @@ function jugarMario()
 %
 % Requiere: inicio.m, actividad1.m, generarNivelActividad1.m,
 %           mariomundo.m, va.m y las imagenes de bloques/tubos.
+%
+% Assets reales opcionales (no incluidos, ponlos tu si los consigues por
+% tu cuenta): si existen, se usan automaticamente; si no, se usa el
+% sprite/musica sintetizados de este proyecto.
+%   recursos/mario.png  -> sprite de Mario, PNG con canal alfa (fondo
+%                          transparente), de pie, ~16x32 o 32x32 px.
+%   recursos/tema.mp3   -> musica de fondo, cualquier mp3.
+
+    recursosDir = fullfile(fileparts(mfilename('fullpath')),'..','recursos');
 
     %% Generar el nivel (Primera actividad) -------------------------------
     [~,posbloques,postubos] = inicio();
@@ -39,9 +48,29 @@ function jugarMario()
     hold(ax,'on');
     axis(ax,'image'); axis(ax,'off');
 
-    cuerpo = rectangle('Position',[0,0,1,1],'FaceColor',[0.85,0.1,0.1],'EdgeColor','none');
-    gorra  = rectangle('Position',[0,0,1,1],'FaceColor',[0.85,0.1,0.1],'EdgeColor','none');
+    % Sprite de Mario: usa recursos/mario.png si existe, si no dibuja un
+    % rectangulo simple (cuerpo + gorra) como marcador.
+    usarSprite = false;
+    spriteImg = [];
+    rutaSprite = fullfile(recursosDir,'mario.png');
+    if isfile(rutaSprite)
+        try
+            [img,~,alpha] = imread(rutaSprite);
+            spriteImg = image(ax,'CData',img,'XData',[0,1],'YData',[0,1]);
+            if ~isempty(alpha)
+                set(spriteImg,'AlphaData',double(alpha)/255);
+            end
+            usarSprite = true;
+        catch
+            usarSprite = false;
+        end
+    end
+    if ~usarSprite
+        cuerpo = rectangle('Position',[0,0,1,1],'FaceColor',[0.85,0.1,0.1],'EdgeColor','none');
+        gorra  = rectangle('Position',[0,0,1,1],'FaceColor',[0.85,0.1,0.1],'EdgeColor','none');
+    end
     tituloTxt = title(ax,'','Color','w');
+    mirando = 1; % 1 = derecha, -1 = izquierda (para voltear el sprite)
 
     %% Estado del jugador -----------------------------------------------
     playerW = 12; playerH = 28;
@@ -60,9 +89,15 @@ function jugarMario()
     teclas = struct('izq',false,'der',false,'salto',false);
 
     %% Musica (opcional, con try/catch por si no hay dispositivo de audio) --
+    % Usa recursos/tema.mp3 si existe; si no, el tema sintetizado (chiptune).
     player = [];
     try
-        [y,Fs] = marioTheme();
+        rutaTema = fullfile(recursosDir,'tema.mp3');
+        if isfile(rutaTema)
+            [y,Fs] = audioread(rutaTema);
+        else
+            [y,Fs] = marioTheme();
+        end
         player = audioplayer(y,Fs);
         player.StopFcn = @(src,~) play(src); % loop
         play(player);
@@ -88,6 +123,9 @@ function jugarMario()
         jugador.vx = 0;
         if teclas.izq,  jugador.vx = jugador.vx - velMover; end
         if teclas.der,  jugador.vx = jugador.vx + velMover; end
+        if jugador.vx ~= 0
+            mirando = sign(jugador.vx);
+        end
 
         if teclas.salto && jugador.enSuelo
             jugador.vy = velSalto;
@@ -123,12 +161,16 @@ function jugarMario()
             jugador.enSuelo = false;
         end
 
-        % Caida por un hueco (fila 12 = negro)
+        % Caida por un hueco (fila 12 = negro): reinicia el nivel desde cero
         if jugador.y > worldH + 80
             muertes = muertes + 1;
-            jugador.x = max(0,jugador.x - 48); % reaparece un poco atras
+            jugador.x = spawnX;
             jugador.y = spawnY;
+            jugador.vx = 0;
             jugador.vy = 0;
+            jugador.enSuelo = false;
+            mirando = 1;
+            camX = 0;
         end
 
         % Meta: llegar al final del nivel
@@ -162,8 +204,17 @@ function jugarMario()
         xlim(ax,[camX,camX+viewW]);
         ylim(ax,[0,viewH]);
 
-        set(cuerpo,'Position',[jugador.x,jugador.y+8,playerW,playerH-8]);
-        set(gorra, 'Position',[jugador.x-1,jugador.y,playerW+2,8]);
+        if usarSprite
+            if mirando >= 0
+                xd = [jugador.x, jugador.x+playerW];
+            else
+                xd = [jugador.x+playerW, jugador.x];
+            end
+            set(spriteImg,'XData',xd,'YData',[jugador.y,jugador.y+playerH]);
+        else
+            set(cuerpo,'Position',[jugador.x,jugador.y+8,playerW,playerH-8]);
+            set(gorra, 'Position',[jugador.x-1,jugador.y,playerW+2,8]);
+        end
 
         if vivo
             set(tituloTxt,'String',sprintf('Mario jugable - muertes: %d',muertes));
