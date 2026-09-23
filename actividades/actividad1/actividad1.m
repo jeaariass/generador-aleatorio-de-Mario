@@ -8,10 +8,10 @@ function [posbloques2,postubos2] = actividad1(posbloques,postubos)
     end
 
     % --- Probabilidades de cada combinacion: DEFINIRLAS AQUI -----------
-    pBB = [0.90];   % baldosa-baldosa
-    pHH = [0.05];   % hueco-hueco
-    pHB = [0.025];   % hueco-baldosa
-    pBH = [0.025];   % baldosa-hueco
+    pBB = [0.80];   % baldosa-baldosa
+    pHH = [0.08];   % hueco-hueco
+    pHB = [0.06];   % hueco-baldosa
+    pBH = [0.06];   % baldosa-hueco
 
     p = [pBB,pHH,pHB,pBH];
 
