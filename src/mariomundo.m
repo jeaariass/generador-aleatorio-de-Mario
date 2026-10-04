@@ -3,13 +3,15 @@ function [mundo] = mariomundo(posbloques,postubos)
     a{1} = uint8(zeros(16,16,3));
     a{2} = imread('baldosa.png');
     a{3} = imread('interrogante.png');
-    a{4} = imread('ladrillo.png');
+    a{4} = imread('ladrillo.png');    
+    a{20} = imread('lakitu.jpg');
+    a{21} = imread('lakitu_cloud.jpg');
     
     % Tubos
     b{1} = uint8(zeros(32,32,3));
     b{2} = imread('tubo.png');
     
-    % Máscara para los tubos
+    % MÃ¡scara para los tubos
     c{1} = uint8(ones(32,32,3));
     c{2} = uint8(zeros(32,32,3));
 
