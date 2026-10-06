@@ -1,4 +1,3 @@
-+
 function [bloquesfin,tubosfin] = actividad7(bloquesfin,tubosfin)
 
 %% Generacion de nubes en la fila 2
