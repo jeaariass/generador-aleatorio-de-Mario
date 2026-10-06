@@ -131,9 +131,6 @@ hold(ax,'on');
 axis(ax,'image');
 axis(ax,'off');
 
-% Dejar una franja arriba reservada para el HUD (sin superponerse)
-set(ax,'Units','normalized','Position',[0,0,1,0.90]);
-
 
 %% ================================================================
 % PLANTAS
@@ -305,45 +302,6 @@ end
 %% Titulo -----------------------------------------------------------
 
 tituloTxt = title(ax,'','Color','w');
-
-
-%% ================================================================
-% HUD DE MONEDAS (icono + numero, fijo en pantalla)
-% ================================================================
-% Eje aparte, en coordenadas de figura (no de mundo), para que no se
-% mueva cuando la camara hace scroll.
-
-hudAxes = axes(fig, ...
-    'Units','normalized', ...
-    'Position',[0.02,0.91,0.16,0.08], ...
-    'Color','none');
-
-axis(hudAxes,'off');
-
-set(hudAxes,'XLim',[0,3],'YLim',[0,1],'YDir','reverse');
-
-hold(hudAxes,'on');
-
-if ~isempty(monedaImg)
-
-    image(hudAxes, ...
-        'CData',monedaImg, ...
-        'AlphaData',double(monedaAlpha)/255, ...
-        'XData',[0,1], ...
-        'YData',[0,1]);
-
-end
-
-textoMonedas = text(hudAxes,1.3,0.5,'0', ...
-    'Color','w', ...
-    'FontSize',18, ...
-    'FontWeight','bold', ...
-    'VerticalAlignment','middle', ...
-    'HorizontalAlignment','left');
-
-uistack(hudAxes,'top');
-
-axes(ax); %#ok<LAXES>  % volver a dejar ax como el eje activo
 
 
 %% Direccion de Mario -----------------------------------------------
@@ -601,9 +559,12 @@ setappdata(0,'marioFig',fig);
 
             if jugador.vy > 0
 
-                % Mario esta cayendo
-                filaTile = ...
-                    floor((nuevaY+playerH)/tile);
+                % Mario esta cayendo. Con caidas rapidas (mucha
+                % velocidad acumulada) un solo frame puede recorrer
+                % varias filas: se busca la primera fila solida en
+                % todo ese recorrido, no solo la de la posicion final,
+                % para no "saltarse" el piso o una plataforma delgada.
+                filaTile = filaSolidaCayendo(jugador.y,nuevaY,jugador.x);
 
 
                 jugador.y = ...
@@ -830,16 +791,19 @@ setappdata(0,'marioFig',fig);
             floor((x+playerW-0.01)/tile)+1);
 
 
+        % r1 se acota tambien por arriba (no solo por abajo): si una
+        % caida rapida hace que "y" quede mas alla de la ultima fila
+        % en un solo frame, sin este tope la funcion diria "no hay
+        % colision" y el jugador se atravesaria el piso de largo.
         r1 = max(1, ...
-            floor(y/tile)+1);
+            min(worldRows,floor(y/tile)+1));
 
 
         r2 = min(worldRows, ...
             floor((y+playerH-0.01)/tile)+1);
 
 
-        if r1 > worldRows || ...
-           r2 < 1 || ...
+        if r2 < 1 || ...
            c1 > worldCols || ...
            c2 < 1
 
@@ -877,6 +841,42 @@ setappdata(0,'marioFig',fig);
         r2 = min(worldRows,floor((y+playerH-0.01)/tile)+1);
 
         fila = r1;
+
+        for rr = r1:r2
+
+            if any(solidMask(rr,c1:c2))
+
+                fila = rr;
+
+                break;
+
+            end
+
+        end
+
+    end
+
+
+%% ================================================================
+% PRIMERA FILA SOLIDA EN UNA CAIDA (recorrido completo del frame)
+% ================================================================
+% Con velocidades altas, un solo frame puede mover al jugador varias
+% filas de golpe. Se recorre desde donde estaban los pies antes del
+% frame hasta donde quedarian despues, y se toma la primera fila
+% solida de ese recorrido (no solo la de la posicion final), para
+% no atravesar el piso ni una plataforma delgada.
+
+    function fila = filaSolidaCayendo(yAnterior,yNueva,x)
+
+        c1 = max(1,floor(x/tile)+1);
+
+        c2 = min(worldCols,floor((x+playerW-0.01)/tile)+1);
+
+        r1 = max(1,min(worldRows,floor((yAnterior+playerH)/tile)+1));
+
+        r2 = max(1,min(worldRows,floor((yNueva+playerH-0.01)/tile)+1));
+
+        fila = r2;
 
         for rr = r1:r2
 
@@ -1214,15 +1214,10 @@ setappdata(0,'marioFig',fig);
             set(tituloTxt, ...
                 'String', ...
                 sprintf( ...
-                    'Mario jugable - muertes: %d', ...
-                    muertes));
+                    'Mario jugable - muertes: %d - monedas: %d', ...
+                    muertes,monedas));
 
         end
-
-
-        %% HUD de monedas (icono + numero, fijo en pantalla)
-
-        set(textoMonedas,'String',sprintf('%d',monedas));
 
 
         drawnow limitrate;

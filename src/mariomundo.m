@@ -36,10 +36,10 @@ function [mundo,imgHandle] = mariomundo(posbloques,postubos)
 
 
     %% NUBE DE LAKITU -------------------------------------------------
-    % Se achica el lienzo completo a 16x16 tal cual viene en el
-    % archivo, sin quitarle el fondo (sin chroma-key).
+    % lakitu_cloud.png ya viene del tamano exacto de un tile (16x16)
+    % y con transparencia real: se usa tal cual, igual que lakitu.png.
 
-    [nube,mapNube] = imread('lakitu_cloud.png');
+    [nube,mapNube,alphaNube] = imread('lakitu_cloud.png');
 
     if ~isempty(mapNube)
         nube = im2uint8(ind2rgb(nube,mapNube));
@@ -47,7 +47,9 @@ function [mundo,imgHandle] = mariomundo(posbloques,postubos)
         nube = repmat(nube,[1 1 3]);
     end
 
-    nube = imresize(nube,[16,16],'bilinear');
+    if ~isempty(alphaNube)
+        nube(repmat(alphaNube == 0,[1 1 3])) = 0;
+    end
 
     a{21} = nube;
 
