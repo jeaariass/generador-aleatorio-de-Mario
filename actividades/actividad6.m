@@ -1,11 +1,5 @@
 function [bloques,tubos] = actividad6(bloques,tubos)
 
-persistent huboMonedaAnterior
-
-if isempty(huboMonedaAnterior)
-    huboMonedaAnterior = false;
-end
-
 filasConBloques = [4 8];
 
 %% Contenido de los interrogantes 
@@ -31,13 +25,13 @@ for fila = filasConBloques
 
 end
 
-%% Monedas en ladrillo-ladrillo 
-
-huboMonedaEsta = false;
+%% Monedas en ladrillo-ladrillo
 
 for fila = filasConBloques
 
-    if isequal(bloques(fila,:),[4 4]) && ~huboMonedaAnterior
+    estadoFila = bloques(fila,:);
+
+    if isequal(estadoFila,[4 4])
 
         % 2/3 de probabilidad de generar una moneda
         aparece = va([1 2],[2/3 1/3]);
@@ -49,14 +43,28 @@ for fila = filasConBloques
 
             bloques(fila,colMoneda) = 40;
 
-            huboMonedaEsta = true;
+        end
 
+    elseif isequal(estadoFila,[1 4])
+
+        % Vacio-ladrillo: 40% de probabilidad de moneda en el ladrillo
+        aparece = va([1 2],[0.40 0.60]);
+
+        if aparece == 1
+            bloques(fila,2) = 40;
+        end
+
+    elseif isequal(estadoFila,[4 1])
+
+        % Ladrillo-vacio: 30% de probabilidad de moneda en el ladrillo
+        aparece = va([1 2],[0.30 0.70]);
+
+        if aparece == 1
+            bloques(fila,1) = 40;
         end
 
     end
 
 end
-
-huboMonedaAnterior = huboMonedaEsta;
 
 end

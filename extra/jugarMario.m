@@ -568,7 +568,7 @@ setappdata(0,'marioFig',fig);
 
 
                 jugador.y = ...
-                    filaTile*tile - playerH;
+                    (filaTile-1)*tile - playerH;
 
 
                 jugador.enSuelo = true;
