@@ -55,16 +55,21 @@ function [mundo,imgHandle] = mariomundo(posbloques,postubos)
 
 
     %% CONTENIDO OCULTO DE BLOQUES (actividad 6) ---------------------
-    % Mismo sprite visible que el bloque base: el contenido
-    % (flor/estrella/moneda) esta oculto hasta romper el bloque en
-    % el juego, por eso en el mapa estatico se ven identicos.
+    % Se mezcla el sprite base con un tinte de color para poder ubicar
+    % visualmente el contenido oculto (flor/estrella/moneda) en el mapa
+    % estatico, sin necesitar sprites nuevos.
 
-    % 30 = interrogante con flor, 31 = interrogante con estrella
-    a{30} = a{3};
-    a{31} = a{3};
+    % 30 = interrogante con flor (tinte verde)
+    tinteFlor = repmat(reshape(uint8([60 200 60]),1,1,3),16,16);
+    a{30} = uint8(0.5*double(a{3}) + 0.5*double(tinteFlor));
 
-    % 40 = ladrillo con moneda
-    a{40} = a{4};
+    % 31 = interrogante con estrella (tinte amarillo)
+    tinteEstrella = repmat(reshape(uint8([255 220 40]),1,1,3),16,16);
+    a{31} = uint8(0.5*double(a{3}) + 0.5*double(tinteEstrella));
+
+    % 40 = ladrillo con moneda (tinte dorado)
+    tinteMoneda = repmat(reshape(uint8([255 180 0]),1,1,3),16,16);
+    a{40} = uint8(0.5*double(a{4}) + 0.5*double(tinteMoneda));
 
 
     %% TUBOS Y PLANTA -----------------------------------------------
