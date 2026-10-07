@@ -31,11 +31,6 @@ for n = 1:iteraciones
     % Actividad 2: genera los tubos
     [bloquesfin,tubosfin] = actividad2(bloquesfin,tubosfin);
 
-    % actividad6 pudo haber marcado el par anterior con contenido oculto
-    % (30/31 = interrogante con flor/estrella, 40 = ladrillo con moneda).
-    % actividad3 y actividad4 solo conocen los tipos base (1/3/4), asi
-    % que se normaliza aqui antes de que los lean, sin modificar esos
-    % archivos.
     bloquesfin([4 8],:) = normalizarContenidoOculto(bloquesfin([4 8],:));
 
     % Actividad 3: genera bloques en la fila 8
